@@ -1,31 +1,12 @@
 {
-  "packages": {
-    "packages/core": {
-      "release-type": "node",
-      "package-name": "@open-socket/core",
-      "changelog-path": "CHANGELOG.md",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": false,
-      "draft": false,
-      "prerelease": false
-    },
-    "packages/testing-utils": {
-      "release-type": "node",
-      "package-name": "@open-socket/testing-utils",
-      "changelog-path": "CHANGELOG.md",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": false,
-      "draft": false,
-      "prerelease": false
-    }
-  },
-  "bootstrap-sha": "initial-commit",
-  "last-release-sha": "initial-commit",
-  "release-search-depth": 100,
-  "commit-search-depth": 500,
-  "group-pull-request-title-pattern": "chore: release ${version}",
-  "pull-request-title-pattern": "chore: release ${component} ${version}",
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "include-component-in-tag": true,
+  "include-v-in-tag": true,
+  "tag-separator": "-",
   "pull-request-header": ":rocket: OpenSocket Release",
+  "separate-pull-requests": false,
+  "group-pull-request-title-pattern": "chore: release ${version}",
   "changelog-sections": [
     { "type": "feat", "section": "Features", "hidden": false },
     { "type": "fix", "section": "Bug Fixes", "hidden": false },
@@ -40,7 +21,12 @@
     { "type": "refactor", "section": "Code Refactoring", "hidden": true },
     { "type": "test", "section": "Tests", "hidden": true }
   ],
-  "include-component-in-tag": true,
-  "include-v-in-tag": true,
-  "tag-separator": "-"
+  "packages": {
+    "packages/core": {
+      "package-name": "@open-socket/core"
+    },
+    "packages/testing-utils": {
+      "package-name": "@open-socket/testing-utils"
+    }
+  }
 }
