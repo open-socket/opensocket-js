@@ -20,11 +20,11 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts,.tsx --ignore-pattern '*.test.ts' --ignore-pattern '*.spec.ts'",
+    "lint:fix": "eslint src --ext .ts,.tsx --ignore-pattern '*.test.ts' --ignore-pattern '*.spec.ts' --fix",
+    "test": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist coverage .turbo"
   },

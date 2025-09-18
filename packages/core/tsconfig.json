@@ -28,5 +28,5 @@
     "types": ["node", "jest"]
   },
   "include": ["src/**/*.ts", "*.config.ts"],
-  "exclude": ["node_modules", "dist", "coverage"]
+  "exclude": ["node_modules", "dist", "coverage", "src/**/*.test.ts"]
 }

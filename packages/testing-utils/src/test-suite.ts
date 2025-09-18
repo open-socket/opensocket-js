@@ -42,7 +42,7 @@ export const createProviderTestSuite = (
         expect(channel.name).toBe('test-channel');
 
         const messages: Message[] = [];
-        await channel.subscribe('test', msg => {
+        await channel.subscribe('test', (msg: Message) => {
           messages.push(msg);
         });
 

@@ -85,7 +85,7 @@ export class TestHelpers {
   ): Promise<Message[]> {
     const messages: Message[] = [];
 
-    const subscription = await channel.subscribe(event, msg => {
+    const subscription = await channel.subscribe(event, (msg: Message) => {
       messages.push(msg);
     });
 

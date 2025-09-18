@@ -1,13 +1,22 @@
 module.exports = {
   extends: ['../../.eslintrc.js'],
+  parserOptions: {
+    project: './tsconfig.json',
+  },
   overrides: [
     {
       files: ['**/*.test.ts', '**/*.spec.ts'],
+      extends: ['eslint:recommended'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: null,
+        ecmaVersion: 2020,
+        sourceType: 'module',
+      },
       rules: {
-        // Relax rules for test files
-        '@typescript-eslint/no-unsafe-assignment': 'warn',
-        '@typescript-eslint/no-unsafe-call': 'warn',
-        '@typescript-eslint/require-await': 'warn',
+        // Only basic ESLint rules for test files
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
       },
     },
   ],

@@ -45,10 +45,10 @@ export class OpenSocketError extends Error {
   public readonly code: ErrorCode;
 
   /** Additional error details */
-  public readonly details?: Record<string, unknown>;
+  public readonly details: Record<string, unknown> | undefined;
 
   /** Original error that caused this error */
-  public readonly cause?: Error;
+  public readonly cause: Error | undefined;
 
   /** Timestamp when error occurred */
   public readonly timestamp: number;
