@@ -1,0 +1,93 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (leave empty for current version)'
+        required: false
+        type: string
+      tag:
+        description: 'NPM tag (latest, next, beta, etc.)'
+        required: false
+        default: 'latest'
+        type: string
+      dry-run:
+        description: 'Dry run (do not actually publish)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Set version (if provided)
+        if: inputs.version != ''
+        run: |
+          echo "Setting version to ${{ inputs.version }}"
+          pnpm changeset version --snapshot ${{ inputs.version }}
+
+      - name: Publish packages (Dry Run)
+        if: inputs.dry-run == true
+        run: |
+          echo "=== DRY RUN MODE ==="
+          pnpm changeset publish --dry-run --tag ${{ inputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages
+        if: inputs.dry-run == false
+        run: |
+          echo "Publishing packages with tag: ${{ inputs.tag }}"
+          pnpm changeset publish --tag ${{ inputs.tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create summary
+        run: |
+          echo "## 📦 NPM Publish Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ inputs.dry-run }}" == "true" ]]; then
+            echo "🔍 **Mode**: Dry Run" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🚀 **Mode**: Published" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "🏷️ **Tag**: ${{ inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ inputs.version }}" != "" ]]; then
+            echo "📌 **Version**: ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Packages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for package in packages/*/package.json; do
+            if [ -f "$package" ]; then
+              name=$(jq -r .name "$package")
+              version=$(jq -r .version "$package")
+              echo "- **$name**: v$version" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

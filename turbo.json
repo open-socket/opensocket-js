@@ -1,0 +1,58 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": ["NODE_ENV"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": [],
+      "inputs": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx"
+      ]
+    },
+    "test": {
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "test/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
+      ],
+      "env": ["NODE_ENV"]
+    },
+    "test:coverage": {
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "test/**"
+      ],
+      "env": ["NODE_ENV"]
+    },
+    "test:providers": {
+      "dependsOn": ["build"],
+      "outputs": [],
+      "env": ["NODE_ENV", "PUSHER_*", "ABLY_*", "SOCKETIO_*"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    }
+  }
+}
