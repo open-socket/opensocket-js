@@ -1,6 +1,6 @@
 {
   "name": "@open-socket/testing-utils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Testing utilities for OpenSocket",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
