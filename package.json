@@ -1,6 +1,6 @@
 {
   "name": "opensocket-js",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "OpenSocket JavaScript SDK - Vendor-agnostic real-time communication",
   "scripts": {
