@@ -13,12 +13,7 @@
     },
     "lint": {
       "outputs": [],
-      "inputs": [
-        "**/*.js",
-        "**/*.jsx",
-        "**/*.ts",
-        "**/*.tsx"
-      ]
+      "inputs": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
     },
     "test": {
       "outputs": ["coverage/**"],
@@ -35,11 +30,7 @@
     },
     "test:coverage": {
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "tests/**",
-        "test/**"
-      ],
+      "inputs": ["src/**", "tests/**", "test/**"],
       "env": ["NODE_ENV"]
     },
     "test:providers": {

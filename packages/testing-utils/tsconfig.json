@@ -10,7 +10,5 @@
   },
   "include": ["src/**/*", "*.config.ts"],
   "exclude": ["node_modules", "dist", "coverage"],
-  "references": [
-    { "path": "../core" }
-  ]
+  "references": [{ "path": "../core" }]
 }

@@ -25,8 +25,8 @@ import { PusherProvider } from '@open-socket/provider-pusher';
 const socket = await createOpenSocket({
   provider: new PusherProvider({
     key: 'your-pusher-key',
-    cluster: 'us2'
-  })
+    cluster: 'us2',
+  }),
 });
 
 // Connect to the provider
@@ -36,13 +36,13 @@ await socket.connect();
 const channel = socket.channel('my-channel');
 
 // Listen for messages
-await channel.subscribe('my-event', (message) => {
+await channel.subscribe('my-event', message => {
   console.log('Received:', message.data);
 });
 
 // Publish messages
-await channel.publish('my-event', { 
-  text: 'Hello, real-time world!' 
+await channel.publish('my-event', {
+  text: 'Hello, real-time world!',
 });
 ```
 
@@ -50,15 +50,15 @@ await channel.publish('my-event', {
 
 This monorepo contains the following packages:
 
-| Package | Description | Version |
-|---------|-------------|---------|
-| [`@open-socket/core`](./packages/core) | Core abstractions and interfaces | ![npm](https://img.shields.io/npm/v/@open-socket/core) |
+| Package                                                  | Description                         | Version                                                         |
+| -------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------- |
+| [`@open-socket/core`](./packages/core)                   | Core abstractions and interfaces    | ![npm](https://img.shields.io/npm/v/@open-socket/core)          |
 | [`@open-socket/testing-utils`](./packages/testing-utils) | Testing utilities and mock provider | ![npm](https://img.shields.io/npm/v/@open-socket/testing-utils) |
 
 ### Provider Packages (Coming Soon)
 
 - `@open-socket/provider-pusher` - Pusher adapter
-- `@open-socket/provider-ably` - Ably adapter  
+- `@open-socket/provider-ably` - Ably adapter
 - `@open-socket/provider-socketio` - Socket.io adapter
 
 ### Framework Packages (Coming Soon)
@@ -83,17 +83,17 @@ One of the key benefits of OpenSocket is the ability to switch providers easily:
 ```typescript
 // Using Pusher
 const socket = await createOpenSocket({
-  provider: new PusherProvider({ key: 'pusher-key' })
+  provider: new PusherProvider({ key: 'pusher-key' }),
 });
 
 // Switch to Ably (same API!)
 const socket = await createOpenSocket({
-  provider: new AblyProvider({ key: 'ably-key' })
+  provider: new AblyProvider({ key: 'ably-key' }),
 });
 
 // Switch to Socket.io (same API!)
 const socket = await createOpenSocket({
-  provider: new SocketIOProvider({ url: 'http://localhost:3000' })
+  provider: new SocketIOProvider({ url: 'http://localhost:3000' }),
 });
 ```
 
@@ -155,14 +155,14 @@ pnpm format
 
 ## 📊 Provider Feature Matrix
 
-| Feature | Pusher | Ably | Socket.io |
-|---------|--------|------|-----------|
-| Public Channels | ✅ | ✅ | ✅ |
-| Private Channels | ✅ | ✅ | ✅ |
-| Presence | ✅ | ✅ | ✅ |
-| Message History | ❌ | ✅ | ⚠️ |
-| Binary Data | ❌ | ✅ | ✅ |
-| Acknowledgments | ❌ | ✅ | ✅ |
+| Feature          | Pusher | Ably | Socket.io |
+| ---------------- | ------ | ---- | --------- |
+| Public Channels  | ✅     | ✅   | ✅        |
+| Private Channels | ✅     | ✅   | ✅        |
+| Presence         | ✅     | ✅   | ✅        |
+| Message History  | ❌     | ✅   | ⚠️        |
+| Binary Data      | ❌     | ✅   | ✅        |
+| Acknowledgments  | ❌     | ✅   | ✅        |
 
 ## 🔌 Middleware
 
@@ -171,15 +171,15 @@ Extend OpenSocket with custom middleware:
 ```typescript
 const loggingMiddleware = {
   name: 'logging',
-  pre: async (context) => {
+  pre: async context => {
     console.log('Before:', context.operation);
   },
-  post: async (context) => {
+  post: async context => {
     console.log('After:', context.operation);
   },
   error: async (error, context) => {
     console.error('Error:', error);
-  }
+  },
 };
 
 socket.use(loggingMiddleware);
@@ -203,6 +203,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](./LICE
 ## 🙏 Acknowledgments
 
 OpenSocket is inspired by:
+
 - [OpenFeature](https://openfeature.dev/) for the vendor-agnostic approach
 - The real-time communication community
 

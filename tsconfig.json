@@ -25,9 +25,6 @@
     "allowUnreachableCode": false,
     "exactOptionalPropertyTypes": true
   },
-  "references": [
-    { "path": "./packages/core" },
-    { "path": "./packages/testing-utils" }
-  ],
+  "references": [{ "path": "./packages/core" }, { "path": "./packages/testing-utils" }],
   "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.spec.ts"]
 }
