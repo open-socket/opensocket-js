@@ -16,7 +16,8 @@
     "version": "changeset version",
     "release": "turbo run build --filter='./packages/*' && changeset publish",
     "clean": "turbo run clean && rm -rf node_modules",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "typecheck": "turbo run typecheck"
   },
   "repository": {
     "type": "git",
