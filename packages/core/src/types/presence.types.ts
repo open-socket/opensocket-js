@@ -34,7 +34,7 @@ export enum PresenceEvent {
   /** Member data updated */
   UPDATE = 'update',
   /** Presence state synchronized */
-  SYNC = 'sync'
+  SYNC = 'sync',
 }
 
 /**

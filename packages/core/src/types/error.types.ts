@@ -34,7 +34,7 @@ export enum ErrorCode {
   /** Channel not found */
   CHANNEL_NOT_FOUND = 'OS013',
   /** Unknown error */
-  UNKNOWN = 'OS999'
+  UNKNOWN = 'OS999',
 }
 
 /**
@@ -43,22 +43,17 @@ export enum ErrorCode {
 export class OpenSocketError extends Error {
   /** Error code */
   public readonly code: ErrorCode;
-  
+
   /** Additional error details */
   public readonly details?: Record<string, unknown>;
-  
+
   /** Original error that caused this error */
   public readonly cause?: Error;
-  
+
   /** Timestamp when error occurred */
   public readonly timestamp: number;
 
-  constructor(
-    message: string,
-    code: ErrorCode,
-    details?: Record<string, unknown>,
-    cause?: Error
-  ) {
+  constructor(message: string, code: ErrorCode, details?: Record<string, unknown>, cause?: Error) {
     super(message);
     this.name = 'OpenSocketError';
     this.code = code;
@@ -83,7 +78,7 @@ export class OpenSocketError extends Error {
       details: this.details,
       timestamp: this.timestamp,
       stack: this.stack,
-      cause: this.cause?.message
+      cause: this.cause?.message,
     };
   }
 }

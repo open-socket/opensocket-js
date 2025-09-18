@@ -1,6 +1,6 @@
 import { OpenSocket, createOpenSocket } from './opensocket';
 import { MockProvider } from '@open-socket/testing-utils';
-import { ConnectionState, ErrorCode } from './types';
+import { ConnectionState } from './types';
 
 describe('OpenSocket', () => {
   let openSocket: OpenSocket;
@@ -18,7 +18,7 @@ describe('OpenSocket', () => {
   describe('Initialization', () => {
     it('should initialize with a provider', async () => {
       await openSocket.initialize({
-        provider: mockProvider
+        provider: mockProvider,
       });
 
       expect(openSocket.getProvider()).toBe(mockProvider);
@@ -27,9 +27,9 @@ describe('OpenSocket', () => {
     it('should throw error if already initialized', async () => {
       await openSocket.initialize({ provider: mockProvider });
 
-      await expect(
-        openSocket.initialize({ provider: mockProvider })
-      ).rejects.toThrow('already initialized');
+      await expect(openSocket.initialize({ provider: mockProvider })).rejects.toThrow(
+        'already initialized'
+      );
     });
   });
 
@@ -71,7 +71,7 @@ describe('OpenSocket', () => {
   describe('createOpenSocket helper', () => {
     it('should create and initialize OpenSocket', async () => {
       const socket = await createOpenSocket({
-        provider: mockProvider
+        provider: mockProvider,
       });
 
       expect(socket).toBeInstanceOf(OpenSocket);

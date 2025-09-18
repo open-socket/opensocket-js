@@ -12,7 +12,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "composite": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -28,6 +27,6 @@
     "exactOptionalPropertyTypes": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "coverage", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "include": ["src/**/*.ts", "*.config.ts"],
+  "exclude": ["node_modules", "dist", "coverage"]
 }

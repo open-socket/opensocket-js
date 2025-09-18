@@ -8,7 +8,6 @@ import type {
   IChannel,
   ChannelOptions,
   ConnectionOptions,
-  ConnectionState,
   ProviderEvent,
   EventHandler,
   ProviderCapabilities,
@@ -18,11 +17,9 @@ import type {
   HistoryOptions,
   IPresence,
   PresenceMember,
-  PresenceEvent,
   PresenceHandler,
-  ChannelState
 } from '@open-socket/core';
-import { NotSupportedError } from '@open-socket/core';
+import { ConnectionState, PresenceEvent, ChannelState, NotSupportedError } from '@open-socket/core';
 
 /**
  * Mock channel implementation
@@ -35,18 +32,30 @@ class MockChannel<T = unknown> implements IChannel<T> {
   private subscriptions: Map<string, Subscription> = new Map();
   private nextSubscriptionId = 1;
 
-  constructor(name: string, private options?: ChannelOptions) {
+  constructor(
+    name: string,
+    private options?: ChannelOptions
+  ) {
     this.name = name;
   }
 
-  async subscribe(eventOrHandler: string | MessageHandler<T>, handler?: MessageHandler<T>): Promise<Subscription> {
+  subscribe(
+    eventOrHandler: string | MessageHandler<T>,
+    handler?: MessageHandler<T>
+  ): Promise<Subscription> {
     const event = typeof eventOrHandler === 'string' ? eventOrHandler : '*';
-    const messageHandler = typeof eventOrHandler === 'function' ? eventOrHandler : handler!;
+    const messageHandler = typeof eventOrHandler === 'function' ? eventOrHandler : handler;
+    if (!messageHandler) {
+      throw new Error('Handler must be provided');
+    }
 
     if (!this.handlers.has(event)) {
       this.handlers.set(event, new Set());
     }
-    this.handlers.get(event)!.add(messageHandler);
+    const eventHandlers = this.handlers.get(event);
+    if (eventHandlers) {
+      eventHandlers.add(messageHandler);
+    }
 
     const id = `sub-${this.nextSubscriptionId++}`;
     const subscription: Subscription = {
@@ -54,21 +63,21 @@ class MockChannel<T = unknown> implements IChannel<T> {
       unsubscribe: async () => {
         this.handlers.get(event)?.delete(messageHandler);
         this.subscriptions.delete(id);
-      }
+      },
     };
 
     this.subscriptions.set(id, subscription);
     this.state = ChannelState.SUBSCRIBED;
-    return subscription;
+    return Promise.resolve(subscription);
   }
 
-  async publish(event: string, data: T): Promise<void> {
+  publish(event: string, data: T): Promise<void> {
     const message: Message<T> = {
       id: `msg-${Date.now()}-${Math.random()}`,
       channel: this.name,
       event,
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.messages.push(message);
@@ -80,6 +89,8 @@ class MockChannel<T = unknown> implements IChannel<T> {
     for (const handler of [...handlers, ...wildcardHandlers]) {
       setTimeout(() => handler(message), 0);
     }
+
+    return Promise.resolve();
   }
 
   presence(): IPresence {
@@ -95,15 +106,15 @@ class MockChannel<T = unknown> implements IChannel<T> {
     }
 
     let result = [...this.messages];
-    
+
     if (options?.limit) {
       result = result.slice(-options.limit);
     }
-    
+
     if (options?.reverse) {
       result.reverse();
     }
-    
+
     return result;
   }
 
@@ -138,7 +149,10 @@ class MockPresence implements IPresence {
   private handlers: Set<PresenceHandler> = new Set();
   private currentMemberId?: string;
 
-  subscribe(handlerOrEvent: PresenceHandler | PresenceEvent, handler?: (member: PresenceMember) => void): void {
+  subscribe(
+    handlerOrEvent: PresenceHandler | PresenceEvent,
+    _handler?: (member: PresenceMember) => void
+  ): void {
     if (typeof handlerOrEvent === 'function') {
       this.handlers.add(handlerOrEvent);
     }
@@ -159,14 +173,14 @@ class MockPresence implements IPresence {
   async enter(data?: Record<string, unknown>): Promise<void> {
     const memberId = `member-${Date.now()}`;
     this.currentMemberId = memberId;
-    
+
     const member: PresenceMember = {
       id: memberId,
       data,
       status: 'online',
-      lastSeen: Date.now()
+      lastSeen: Date.now(),
     };
-    
+
     this.members.set(memberId, member);
     this.notifyHandlers(PresenceEvent.ENTER, member);
   }
@@ -208,15 +222,15 @@ class MockPresence implements IPresence {
 export class MockProvider implements IProvider {
   public readonly name = 'MockProvider';
   public readonly version = '1.0.0';
-  
+
   private state: ConnectionState = ConnectionState.DISCONNECTED;
   private channels: Map<string, MockChannel> = new Map();
   private eventHandlers: Map<ProviderEvent, Set<EventHandler>> = new Map();
   private options: ConnectionOptions | undefined;
-  
+
   public simulateError = false;
   public simulateDelay = 0;
-  
+
   private capabilities_: ProviderCapabilities = {
     presence: true,
     history: true,
@@ -227,25 +241,25 @@ export class MockProvider implements IProvider {
     authentication: {
       token: true,
       apiKey: true,
-      custom: true
-    }
+      custom: true,
+    },
   };
 
   async connect(options?: ConnectionOptions): Promise<void> {
     if (this.simulateError) {
       throw new Error('Simulated connection error');
     }
-    
+
     if (this.simulateDelay > 0) {
       await new Promise(resolve => setTimeout(resolve, this.simulateDelay));
     }
-    
+
     this.options = options;
     this.state = ConnectionState.CONNECTING;
     this.emit('state_change', { state: this.state });
-    
+
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     this.state = ConnectionState.CONNECTED;
     this.emit('connected', {});
     this.emit('state_change', { state: this.state });
@@ -254,9 +268,9 @@ export class MockProvider implements IProvider {
   async disconnect(): Promise<void> {
     this.state = ConnectionState.DISCONNECTING;
     this.emit('state_change', { state: this.state });
-    
+
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     this.state = ConnectionState.DISCONNECTED;
     this.emit('disconnected', {});
     this.emit('state_change', { state: this.state });
@@ -266,7 +280,11 @@ export class MockProvider implements IProvider {
     if (!this.channels.has(name)) {
       this.channels.set(name, new MockChannel(name, options));
     }
-    return this.channels.get(name)!;
+    const channel = this.channels.get(name);
+    if (!channel) {
+      throw new Error(`Channel ${name} not found`);
+    }
+    return channel;
   }
 
   getConnectionState(): ConnectionState {
@@ -277,7 +295,10 @@ export class MockProvider implements IProvider {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
-    this.eventHandlers.get(event)!.add(handler);
+    const handlers = this.eventHandlers.get(event);
+    if (handlers) {
+      handlers.add(handler);
+    }
   }
 
   off(event: ProviderEvent, handler: EventHandler): void {

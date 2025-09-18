@@ -37,7 +37,7 @@ export interface ProviderCapabilities {
 export interface IProvider {
   /** Provider name identifier */
   readonly name: string;
-  
+
   /** Provider version */
   readonly version: string;
 

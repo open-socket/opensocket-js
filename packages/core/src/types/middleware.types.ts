@@ -44,7 +44,7 @@ export enum MiddlewareOperation {
   /** Presence leave */
   PRESENCE_LEAVE = 'presence_leave',
   /** Presence update */
-  PRESENCE_UPDATE = 'presence_update'
+  PRESENCE_UPDATE = 'presence_update',
 }
 
 /**
@@ -106,10 +106,7 @@ export class MiddlewareChain {
    * @param context - Middleware context
    * @param operation - Main operation to execute
    */
-  async execute<T>(
-    context: MiddlewareContext,
-    operation: () => Promise<T>
-  ): Promise<T> {
+  async execute<T>(context: MiddlewareContext, operation: () => Promise<T>): Promise<T> {
     // Execute pre-processing
     for (const middleware of this.middlewares) {
       if (middleware.pre) {

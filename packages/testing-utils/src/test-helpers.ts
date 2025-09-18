@@ -19,19 +19,19 @@ export class TestHelpers {
     capabilities?: Record<string, boolean>;
   }): MockProvider {
     const provider = new MockProvider();
-    
+
     if (config?.simulateError) {
       provider.simulateError = true;
     }
-    
+
     if (config?.simulateDelay) {
       provider.simulateDelay = config.simulateDelay;
     }
-    
+
     if (config?.capabilities) {
       provider.setCapabilities(config.capabilities as any);
     }
-    
+
     return provider;
   }
 
@@ -53,11 +53,11 @@ export class TestHelpers {
     events: string[]
   ): Promise<IChannel> {
     const channel = provider.channel(channelName);
-    
+
     for (const event of events) {
       await channel.subscribe(event, () => {});
     }
-    
+
     return channel;
   }
 
@@ -70,7 +70,7 @@ export class TestHelpers {
       channel: channelName,
       event: `event-${i % 3}`,
       data: { index: i, test: true },
-      timestamp: Date.now() + i
+      timestamp: Date.now() + i,
     }));
   }
 
@@ -84,16 +84,16 @@ export class TestHelpers {
     timeout = 5000
   ): Promise<Message[]> {
     const messages: Message[] = [];
-    
-    const subscription = await channel.subscribe(event, (msg) => {
+
+    const subscription = await channel.subscribe(event, msg => {
       messages.push(msg);
     });
-    
+
     const start = Date.now();
     while (messages.length < expectedCount && Date.now() - start < timeout) {
       await new Promise(resolve => setTimeout(resolve, 10));
     }
-    
+
     await subscription.unsubscribe();
     return messages;
   }
@@ -141,14 +141,14 @@ export class TestHelpers {
     const provider = new MockProvider();
     await provider.connect();
     const channel = provider.channel('test-channel');
-    
+
     return {
       provider,
       channel,
       cleanup: async () => {
         await channel.leave();
         await provider.destroy();
-      }
+      },
     };
   }
 }

@@ -20,7 +20,7 @@ export enum ConnectionState {
   /** Connection suspended (temporary failure) */
   SUSPENDED = 'suspended',
   /** Connection failed permanently */
-  FAILED = 'failed'
+  FAILED = 'failed',
 }
 
 /**

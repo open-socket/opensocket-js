@@ -59,7 +59,7 @@ export interface ChannelOptions {
 export interface IChannel<T = unknown> {
   /** Channel name */
   readonly name: string;
-  
+
   /** Channel state */
   readonly state: ChannelState;
 
@@ -130,5 +130,5 @@ export enum ChannelState {
   /** Unsubscribed from channel */
   UNSUBSCRIBED = 'unsubscribed',
   /** Channel error state */
-  FAILED = 'failed'
+  FAILED = 'failed',
 }

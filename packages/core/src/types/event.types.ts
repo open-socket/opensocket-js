@@ -17,12 +17,7 @@ export type ProviderEvent =
 /**
  * Channel event types
  */
-export type ChannelEvent =
-  | 'subscribed'
-  | 'unsubscribed'
-  | 'error'
-  | 'message'
-  | 'state_change';
+export type ChannelEvent = 'subscribed' | 'unsubscribed' | 'error' | 'message' | 'state_change';
 
 /**
  * Generic event handler

@@ -9,12 +9,12 @@ import type {
   IChannel,
   ChannelOptions,
   ConnectionOptions,
-  ConnectionState,
   ProviderEvent,
   EventHandler,
-  Middleware
+  Middleware,
+  MiddlewareContext,
 } from './types';
-import { MiddlewareChain, MiddlewareOperation, MiddlewareContext } from './types';
+import { ConnectionState, MiddlewareChain, MiddlewareOperation } from './types';
 import { OpenSocketError, ErrorCode } from './types';
 
 /**
@@ -49,10 +49,7 @@ export class OpenSocket {
    */
   async initialize(config: OpenSocketConfig): Promise<void> {
     if (this.isInitialized) {
-      throw new OpenSocketError(
-        'OpenSocket is already initialized',
-        ErrorCode.INVALID_STATE
-      );
+      throw new OpenSocketError('OpenSocket is already initialized', ErrorCode.INVALID_STATE);
     }
 
     this.config = config;
@@ -64,6 +61,9 @@ export class OpenSocket {
     }
 
     this.isInitialized = true;
+
+    // Ensure async nature for consistent API
+    await Promise.resolve();
   }
 
   /**
@@ -72,20 +72,20 @@ export class OpenSocket {
    */
   async connect(options?: ConnectionOptions): Promise<void> {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
 
     const context: MiddlewareContext = {
       provider: this.provider,
       operation: MiddlewareOperation.CONNECT,
-      data: { options }
+      data: { options },
     };
 
     return this.middlewareChain.execute(context, async () => {
-      await this.provider!.connect(options);
+      if (!this.provider) {
+        throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
+      }
+      await this.provider.connect(options);
     });
   }
 
@@ -94,15 +94,12 @@ export class OpenSocket {
    */
   async disconnect(): Promise<void> {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
 
     const context: MiddlewareContext = {
       provider: this.provider,
-      operation: MiddlewareOperation.DISCONNECT
+      operation: MiddlewareOperation.DISCONNECT,
     };
 
     return this.middlewareChain.execute(context, async () => {
@@ -113,7 +110,10 @@ export class OpenSocket {
       this.channels.clear();
 
       // Disconnect provider
-      await this.provider!.disconnect();
+      if (!this.provider) {
+        throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
+      }
+      await this.provider.disconnect();
     });
   }
 
@@ -124,21 +124,19 @@ export class OpenSocket {
    */
   channel(name: string, options?: ChannelOptions): IChannel {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
 
     // Return existing channel if available
-    if (this.channels.has(name)) {
-      return this.channels.get(name)!;
+    const existingChannel = this.channels.get(name);
+    if (existingChannel) {
+      return existingChannel;
     }
 
     // Merge with default options
     const channelOptions = {
       ...this.config?.channelDefaults,
-      ...options
+      ...options,
     };
 
     // Create new channel
@@ -165,10 +163,7 @@ export class OpenSocket {
    */
   on(event: ProviderEvent, handler: EventHandler): void {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
     this.provider.on(event, handler);
   }
@@ -180,10 +175,7 @@ export class OpenSocket {
    */
   off(event: ProviderEvent, handler: EventHandler): void {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
     this.provider.off(event, handler);
   }
@@ -193,10 +185,7 @@ export class OpenSocket {
    */
   capabilities() {
     if (!this.provider) {
-      throw new OpenSocketError(
-        'Provider not initialized',
-        ErrorCode.PROVIDER_NOT_INITIALIZED
-      );
+      throw new OpenSocketError('Provider not initialized', ErrorCode.PROVIDER_NOT_INITIALIZED);
     }
     return this.provider.capabilities();
   }
